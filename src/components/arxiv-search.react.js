@@ -39,11 +39,11 @@ class ArxivSearch extends Component {
 		}
 		else {
 			return results.map(result => {
-				const {title, author, summary, link} = result;
+				const {title, authors, summary, link} = result;
 				return (
-					<div>
+					<div className="result" key={link}>
 						<h1>{title}</h1>
-						<h2>{author}</h2>
+						<h2>{authors.join(', ')}</h2>
 						<pre>{summary}</pre>
 						<a href={link}>pdf</a>
 					</div>

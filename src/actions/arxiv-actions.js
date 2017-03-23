@@ -7,10 +7,11 @@ const setSearchQuery = (query) => {
 	};
 };
 
-const finishSearch = (results) => {
+const finishSearch = (results, didFail) => {
 	return {
 		type: arxivActionTypes.FINISH_SEARCH,
-		results
+		results,
+		didFail,
 	};
 };
 
@@ -20,32 +21,34 @@ const getArxivUrl = (query) => {
 
 const startSearch = (query) => {
 	return (dispatch) => {
-		dispatch({type: arxivActionTypes.START_SEARCH});
+		dispatch({type: arxivActionTypes.START_SEARCH, query});
 		return window
 			.fetch(getArxivUrl(query))
 			.then(response => response.text())
 			.then(xml => {
-				console.log(xml);
 				parseString(xml, (err, json) => {
 					if (err) {
-						dispatch(finishSearch([]));
+						const didFail = true;
+						dispatch(finishSearch([], didFail));
 					}
 					else {
 						const results = json.feed.entry.map(entry => {
 							let {author, title, summary, link} = entry;
 							return {
-								author: author[0].name[0],
+								authors: author.map(x => x.name[0]),
 								title: title[0],
 								summary: summary[0],
 								link: link.find(x => x.$.title === 'pdf').$.href
 							}
 						});
-						dispatch(finishSearch(results));
+						const didFail = false;
+						dispatch(finishSearch(results, didFail));
 					}
 				});
 			})
 			.catch(() => {
-				dispatch(finishSearch([]));
+				const didFail = true;
+				dispatch(finishSearch([], didFail));
 			});
 	};
 };

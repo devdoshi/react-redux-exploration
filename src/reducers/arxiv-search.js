@@ -23,6 +23,7 @@ const reducer =
 			case arxivActionTypes.START_SEARCH:
 				return {
 					...state,
+					query: payload.query,
 					isSearchInProgress: true
 				};
 
